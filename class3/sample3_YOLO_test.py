@@ -1,3 +1,4 @@
+'''YOLO辨識光阻桶蓋測試'''
 import time
 import torch   
 import cv2     
