@@ -3,6 +3,7 @@
 
 ### Download
 * [EasyYOLO_Install](https://gmnfuedutw-my.sharepoint.com/:u:/g/personal/10865107_gm_nfu_edu_tw/ERJqedNF9gpDkIBM9tvjir8BrEf656BkXOBVq1G4H06oWg?e=XpSeQQ)
+* password : 123
 ## Class2 🗿
 
 ### Clone repo and install requirements.txt
