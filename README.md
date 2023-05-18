@@ -4,7 +4,17 @@
 ### Download
 * [EasyYOLO_Install](https://gmnfuedutw-my.sharepoint.com/:u:/g/personal/10865107_gm_nfu_edu_tw/ERJqedNF9gpDkIBM9tvjir8BrEf656BkXOBVq1G4H06oWg?e=XpSeQQ)
 * password : 123
+### CUDA Toolkit
+* [CUDA Toolkit Download](https://developer.nvidia.com/cuda-toolkit-archive)
+* CUDA virsion <= 11.1
 ## Class2 🗿
+
+### Create a python environment
+```shell
+pip install virtualenv # install virtualenv
+virtualenv venv --python=python3.8 # create python3.8 environment
+venv\Scripts\activate # launch environment
+```
 
 ### Clone repo and install requirements.txt
 ```shell
