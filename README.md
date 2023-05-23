@@ -25,6 +25,20 @@ cd yolov5
 pip install -r requirement.txt # install
 pip install pyrealsense2 # install
 ```
+### Use GPU
+* [CUDA Toolkit Download](https://developer.nvidia.com/cuda-toolkit-archive)
+* CUDA virsion <= 11.1
+* Install PyTorch
+```shell
+# CUDA 11.1
+pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+
+# CUDA 10.2
+pip install torch==1.8.1+cu102 torchvision==0.9.1+cu102 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+
+# CUDA 10.1
+pip install torch==1.8.1+cu101 torchvision==0.9.1+cu101 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+```
 ## Class3 🗿
 
 ### Clone repo and install requirements.txt
