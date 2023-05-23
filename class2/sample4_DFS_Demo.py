@@ -81,6 +81,8 @@ model.max_det = 1   # 最大檢測數量
 # 定義realsense
 pipeline = rs.pipeline()
 config = rs.config()
+# 指定realsense裝置
+config.enable_device('146322070607')
 # 設定realsense
 config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30) # 深度圖解析度
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.rgb8, 30)# 彩色圖解析度

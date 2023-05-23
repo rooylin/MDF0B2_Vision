@@ -6,6 +6,8 @@ import cv2
 # 定義realsense
 pipeline = rs.pipeline()
 config = rs.config()
+# 指定realsense裝置
+config.enable_device('146322070607')
 # 設定realsense
 config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30) # 深度圖解析度
 config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)# 彩色圖解析度
