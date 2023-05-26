@@ -22,7 +22,7 @@ git clone https://github.com/rooylin/MDF0B2_Vision.git # clone
 cd class2
 git clone https://github.com/ultralytics/yolov5.git # clone
 cd yolov5 
-pip install -r requirement.txt # install
+pip install -r requirements.txt # install
 pip install pyrealsense2 # install
 ```
 ### Use GPU
