@@ -47,7 +47,7 @@ git clone https://github.com/rooylin/MDF0B2_Vision.git # clone
 cd class3
 git clone https://github.com/ultralytics/yolov5.git # clone
 cd yolov5 
-pip install -r requirement.txt # install
+pip install -r requirements.txt # install
 pip install pymcprotocol # install
 ```
     
