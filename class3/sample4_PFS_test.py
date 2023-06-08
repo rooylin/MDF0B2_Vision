@@ -137,7 +137,7 @@ def main():
 
         # 顯示影像
         cv2.imshow('output', output_img[:,:,::-1])
-        cv2.waitKey(0) # 等待任意鍵退出
+        cv2.waitKey(1) # 等待任意鍵退出
 
         # 目標位置
         Tx, Ty, Tz, Trx, Try, Trz = Dx + x, Dy + y, Dz + z, Drx, Dry, Drz
