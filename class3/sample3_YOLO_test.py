@@ -1,10 +1,8 @@
 '''YOLO辨識光阻桶蓋測試'''
-import time
 import torch   
 import cv2     
 import numpy as np 
 import pyrealsense2 as rs
-import pymcprotocol
 
 def realsenseXY2XYZ(pl, x=0, y=0):
     '''realsense_2D座標轉3D座標'''
@@ -19,26 +17,12 @@ def realsenseXY2XYZ(pl, x=0, y=0):
     # 回傳XYZ
     return camera_coordinate
 
-
-'''初始設定'''
-# PLC連線
-
-try:
-    # 建立物件並選擇型號
-    pymc3e = pymcprotocol.Type3E(plctype="iQ-L")
-    # 與設備連線連線
-    pymc3e.connect("192.168.2.101", 5004)
-
-except Exception as e:
-    # 連線失敗顯示錯誤訊息並結束程式
-    print(e)
-    exit()
-
 # 讀取YOLO權重
 model = torch.hub.load('yolov5', 'custom', path='PFS20230502.pt', source='local')
 model.conf = 0.5   # 信心度閥值
 model.iou = 0.7     # IoU閥值
 model.max_det = 1   # 最大檢測數量
+model.classes = [1] # 檢測類別1
 
 # 定義realsense
 pipeline = rs.pipeline()
@@ -46,6 +30,8 @@ config = rs.config()
 # 設定realsense
 config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30) # 深度圖解析度
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.rgb8, 30)# 彩色圖解析度
+# 指定realsense裝置
+config.enable_device('042222072032')
 # 啟動realsense
 pipeline.start(config)
 

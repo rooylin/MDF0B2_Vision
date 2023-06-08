@@ -2,16 +2,6 @@
 import time
 import pymcprotocol
 
-try:
-    # 建立物件並選擇型號
-    pymc3e = pymcprotocol.Type3E(plctype="iQ-L")
-    # 與設備連線連線
-    pymc3e.connect("192.168.2.101", 5004)
-
-except Exception as e:
-    # 連線失敗顯示錯誤訊息並結束程式
-    print(e)
-    exit()
 
 def read_D(D = 0, V = 1):
     '''讀取D值功能: 起始位置, 讀取數量'''
@@ -40,6 +30,17 @@ def robot_move(pose):
 
 if __name__ == '__main__':
     '''測試'''
+    try:
+        # 建立物件並選擇型號
+        pymc3e = pymcprotocol.Type3E(plctype="iQ-L")
+        # 與設備連線連線
+        pymc3e.connect("192.168.2.101", 5004)
+
+    except Exception as e:
+        # 連線失敗顯示錯誤訊息並結束程式
+        print(e)
+        exit()
+        
     x, y, z, rx, ry, rz = 200, 10, 100, 0, 0, 0 # 手臂六姿態
     robot_move([200, 10, 100, 0, 0, 0]) # 移動手臂
     time.sleep(5) # 等待手臂作動完成

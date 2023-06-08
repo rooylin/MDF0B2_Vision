@@ -39,10 +39,15 @@ def write_D(D = 0, V = [0]):
 
 def robot_move(pose): 
     '''手臂移動'''
-    write_D(D=2020, V=pose)  # 寫入POSE，pose為一個List
+    write_D(D=2021, V=pose)  # 寫入POSE，pose為一個List
+    write_D(D=2101, V=[0])  # 執行完畢訊號歸零
     write_D(D=2001, V=[1])  # 執行動作觸發
     time.sleep(0.1) # 等待0.1秒
     write_D(D=2001, V=[0])  # 執行動作觸發復歸
+    while not read_D(D=2101, V=1)[0]: # 等待手臂執行完畢
+        print('Moving...')
+        time.sleep(0.1)
+    return
 
 
 '''初始設定'''
@@ -64,18 +69,36 @@ model = torch.hub.load('yolov5', 'custom', path='PFS20230502.pt', source='local'
 model.conf = 0.5   # 信心度閥值
 model.iou = 0.7     # IoU閥值
 model.max_det = 1   # 最大檢測數量
+model.classes = [1] # 檢測類別1
 
 # 定義realsense
 pipeline = rs.pipeline()
 config = rs.config()
 # 設定realsense
-config.enable_stream(rs.stream.depth, 1024, 768, rs.format.z16, 30) # 深度圖解析度
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30) # 深度圖解析度
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.rgb8, 30)# 彩色圖解析度
+# 指定realsense裝置
+config.enable_device('042222072032')
 # 啟動realsense
 pipeline.start(config)
+# 試拍10張
+for i in range(10):
+    frames = pipeline.wait_for_frames()  
+
+# 定義檢測位置
+Dx, Dy, Dz, Drx, Dry, Drz = 175, -580, -170, 0, 0, -90
+# 定義相機與夾具偏移
+offset_x, offset_y, offset_z = -23, -50, -117
 
 def main():
     '''主程式'''
+    # 控制手臂
+
+    write_D(2000, [0]) # 選擇移動流程
+
+    # 移動至檢測位置
+    robot_move([Dx, Dy, Dz, Drx, Dry, Drz])
+
     # 讀取影像
     frames = pipeline.wait_for_frames()  
     # 取得彩色影像，並轉換格式
@@ -95,44 +118,62 @@ def main():
         # 計算物體3D空間位置(X,Y,Z)
         xyz = realsenseXY2XYZ(pipeline, xcenter, ycenter)
 
-        # 取得目標裁切影像
-        crop = results.crop(save = False)[0].get('im')
-
-        # 轉換3D空間位置(單位mm)
+        # 轉換3D空間位置(單位mm), 相機工具座標
         x = int(xyz[0] * 1000)
         y = int(xyz[1] * 1000)
         z = int(xyz[2] * 1000)
 
+        # 轉換至夾爪工具座標
+        x += offset_x
+        y += offset_y
+        z += offset_z
+
         # 打印結果
-        print(x, y, z)
+        print(x, y, z) 
 
         # 將結果畫至影像
         cv2.putText(output_img, f'X:{x}, Y:{y}, Z:{z}', (10, 55),
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 0), 3, cv2.LINE_AA)
 
+        # 顯示影像
+        cv2.imshow('output', output_img[:,:,::-1])
+        cv2.waitKey(0) # 等待任意鍵退出
+
+        # 目標位置
+        Tx, Ty, Tz, Trx, Try, Trz = Dx + x, Dy + y, Dz + z, Drx, Dry, Drz
+
+        # 移動至蓋子上方
+        robot_move([Tx, Ty, Tz - 50, Trx, Try, Trz])
+
+        # 移動至蓋子
+        robot_move([Tx, Ty, Tz, Trx, Try, Trz]) 
+
+        # 轉開蓋子
+        write_D(2000, [4]) # 選擇開蓋流程
+        # 等待
+        time.sleep(1)
+
+        write_D(D=2001, V=[1])  # 執行動作觸發
+        time.sleep(0.1) # 等待0.1秒
+        write_D(D=2001, V=[0])  # 執行動作觸發復歸
+
+        while not read_D(D=2101, V=1)[0]: # 等待手臂執行完畢
+            print('Griping...')
+            time.sleep(0.1)
+            
+        # 拿起蓋子
+        write_D(2000, [0]) # 選擇移動流程
+        # 等待
+        time.sleep(1)
+        robot_move([Tx, Ty, Tz - 50, Trx, Try, Trz])
+
     else:   # 如果未檢測到物體
         # 在影像上顯示未檢測到物體
         cv2.putText(output_img, f'No object', (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2, cv2.LINE_AA)
-
-    # 顯示影像
-    cv2.imshow('output', output_img[:,:,::-1])
-
-    # 控制手臂
-
-    # 移動至檢測位置
-    robot_move([100, 100, 100, 0, 0, 0])
-    # 移動至蓋子上方
-    robot_move([x, y, z+50, 0, 0, 0])
-    time.sleep(5)
-    # 移動至蓋子
-    robot_move([x, y, z, 0, 0, 0]) 
-    time.sleep(5)
-    # 轉開蓋子
-    write_D(2016, [1])
-    # 拿起蓋子
-    robot_move([x, y, z+50, 0, 0, 0])
+        # 顯示影像
+        cv2.imshow('output', output_img[:,:,::-1])
+        cv2.waitKey(0) # 等待任意鍵退出
 
 
 if __name__ == '__main__':
     main()
-    cv2.waitKey(0) # 等待任意鍵退出
